@@ -1,6 +1,5 @@
-import sys
 import os
-from report_generator import generate_report
+from report_generator import read_code_file
 
 def main():
     # Solicita o nome do arquivo ao usuário
@@ -14,8 +13,7 @@ def main():
     else:
         file_path = filename_with_extension
 
-    # Chama a função generate_report passando o nome do arquivo como argumento
-    generate_report(file_path, filename)
+    read_code_file(file_path, filename)
 
 if __name__ == "__main__":
     main()
