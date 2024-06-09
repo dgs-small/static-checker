@@ -1,4 +1,4 @@
 build
 dist
-static_checker.spec
+syntactic_analyser.spec
 __pycache__
