@@ -6,10 +6,10 @@ def read_code_file(filename, report_filename):
         print(f"O arquivo {filename} não foi encontrado.")
         return
     
-    generate_report_files(report_filename, content)
+    generate_report_files(report_filename, content, filename)
 
 
-def generate_report_files(report_filename, content):
+def generate_report_files(report_filename, content, code_filename):
     report_file_header = """Codigo da Equipe: EQ01\nComponentes:
     Tiago Galvão Pinho; tiagog.pinho@ucsal.edu.br; (71)98366-3017
     João Marcos Gatis Araújo Silva; joaomg.silva@ucsal.edu.br; (71)99900-9154
@@ -18,10 +18,11 @@ def generate_report_files(report_filename, content):
 
     # Cria o arquivo de relatório .LEX
     lex_reportfile_name = report_filename + '.LEX'
-    with open(lex_reportfile_name, 'w') as report_file:
-        report_file.write(f"{report_file_header}\n")
-        report_file.write("Conteudo:\n")
-        report_file.write(content)
+    with open(lex_reportfile_name, 'w') as report_file_lex:
+        report_file_lex.write(f"{report_file_header}\n")
+        report_file_lex.write(f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {code_filename}\n")
+        report_file_lex.write("Conteudo:\n")
+        report_file_lex.write(content)
 
     print(f"Relatório gerado com sucesso: {lex_reportfile_name}")
     
@@ -29,6 +30,7 @@ def generate_report_files(report_filename, content):
     tab_reportfile_name = report_filename + '.TAB'
     with open(tab_reportfile_name, 'w') as report_file_tab:
         report_file_tab.write(f"{report_file_header}\n")
+        report_file_tab.write(f"RELATÓRIO DA TABELA DE SIMBOLOS. Texto fonte analisado: {code_filename}\n")
         report_file_tab.write("Conteudo:\n")
         report_file_tab.write(content)
         
