@@ -10,7 +10,7 @@ class SymbolTable:
         else:
             entry = {
                 "entry_number": len(self.table) + 1,
-                "atom_code": code,
+                "atom_code": code, #Ex: C07
                 "lexeme": lexeme[:30],  # Truncagem de lexeme para 30 caracteres
                 "original_length": len(lexeme),
                 "truncated_length": min(len(lexeme), 30),
