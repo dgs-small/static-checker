@@ -1,4 +1,4 @@
-def reserved_words_and_symbols():
+def reserved_words_and_symbols_table():
     reserved_words_and_symbols = {
         "cadeia": "A01",
         "caracter": "A02",
@@ -52,6 +52,20 @@ def reserved_words_and_symbols():
     }
 
     return reserved_words_and_symbols
+
+
+def token_table():
+    token_table = {
+        "consCadeia": "C01",
+        "consCaracter": "C02",
+        "consInteiro": "C03",
+        "consReal": "C04",
+        "nomFuncao": "C05",
+        "nomPrograma": "C06",
+        "variavel": "C07"
+    }
+    
+    return token_table
 
 
 def generate_report_files(report_filename, content, code_filename):

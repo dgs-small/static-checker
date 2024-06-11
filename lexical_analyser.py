@@ -1,13 +1,14 @@
-from utils import reserved_words_and_symbols
+from utils import reserved_words_and_symbols_table, token_table
 from symbol_table import SymbolTable
 
 import re
 
 class LexicalAnalyser:
     def __init__(self):
-        self.reserved_words_and_symbols = reserved_words_and_symbols()
+        self.reserved_words_and_symbols = reserved_words_and_symbols_table() # Par chave e valor com atomo e codigo de palavras e simbolos reservados
+        self.token_table = token_table() # Par chave e valor com atomo e codigo de cada tipo de identificador
         self.symbol_table = SymbolTable()
-        self.identifier_patterns = {
+        self.token_patterns = {
             "consCadeia": r"\".*?\"",
             "consCaracter": r"'.'",
             "consInteiro": r"\d+",
@@ -16,9 +17,3 @@ class LexicalAnalyser:
             "nomPrograma": r"[a-zA-Z][a-zA-Z0-9]*",
             "variavel": r"[a-zA-Z_][a-zA-Z0-9_]*"
         }
-    
-    def lexical_scan(self, character, position):
-        pass
-    
-    def lexical_analysis(self, character, symbol_table):
-        pass
