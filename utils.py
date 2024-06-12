@@ -62,9 +62,9 @@ def token_table():
         "consReal": "C04",
         "nomFuncao": "C05",
         "nomPrograma": "C06",
-        "variavel": "C07"
+        "variavel": "C07",
     }
-    
+
     return token_table
 
 
@@ -82,8 +82,15 @@ def generate_report_files(report_filename, content, code_filename):
         report_file_lex.write(
             f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {code_filename}\n"
         )
-        report_file_lex.write("Conteudo:\n")
-        report_file_lex.write(content)
+        report_file_lex.write(
+            "---------------------------------------------------------\n"
+        )
+        report_file_lex.write("A fazer")
+        # for entry in content:
+        #     report_file_tab.write(
+        #         f"----------------------------------------------------------------------------\nLexeme: {entry.get('lexeme')}, Código: {entry.get('atom_code')}, IndiceTabSimb: {entry.get('entry_number')}, Linha: {str(entry.get('lines'))}\n"
+        #     )
+        
 
     print(f"Relatório gerado com sucesso: {lex_reportfile_name}")
 
@@ -94,7 +101,10 @@ def generate_report_files(report_filename, content, code_filename):
         report_file_tab.write(
             f"RELATÓRIO DA TABELA DE SIMBOLOS. Texto fonte analisado: {code_filename}\n"
         )
-        report_file_tab.write("Conteudo:\n")
-        report_file_tab.write(content)
+
+        for entry in content:
+            report_file_tab.write(
+                f"----------------------------------------------------------------------------\nEntrada: {entry.get('entry_number')}, Código: {entry.get('atom_code')}, Lexeme: {entry.get('lexeme')}, QtdCharAntesTrunc: {entry.get('original_length')}, QtdCharDepoisTrunc: {entry.get('truncated_length')}, TipoSimb: {entry.get('symbol_type')}, Linha: {str(entry.get('lines'))}\n"
+            )
 
     print(f"Relatório gerado com sucesso: {tab_reportfile_name}")

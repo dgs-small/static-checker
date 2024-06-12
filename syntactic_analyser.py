@@ -1,7 +1,9 @@
 import os
 
-from utils import generate_report_files
+from utils import reserved_words_and_symbols_table, token_table, generate_report_files
 
+
+from lexical_analyser import LexicalAnalyser
 
 def main():
     # Solicita o nome do arquivo ao usuário
@@ -15,7 +17,18 @@ def main():
     else:
         file_path = filename_with_extension
 
-    read_code_file(file_path, filename)
+    file_content = read_code_file(file_path, filename)
+
+    start_lexical_analyser(file_content, filename, file_path)
+
+
+def start_lexical_analyser(file_content, filename, file_path):
+    if file_content is not None:
+        lexical_analyser = LexicalAnalyser(
+            reserved_words_and_symbols_table(), token_table()
+        )
+        lexical_analyser.analyze(file_content)
+        generate_report_files(filename, lexical_analyser.symbol_table.table, file_path)
 
 
 def read_code_file(filename, report_filename):
@@ -26,7 +39,7 @@ def read_code_file(filename, report_filename):
         print(f"O arquivo {filename} não foi encontrado.")
         return
 
-    generate_report_files(report_filename, content, filename)
+    return content
 
 
 if __name__ == "__main__":
