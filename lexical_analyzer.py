@@ -148,7 +148,7 @@ class LexicalAnalyzer:
                 elif name == "consCadeia":
                     return "STR"
                 elif name == "consCaracter":
-                    return "CHR"
+                    return "CHC"
                 elif name == "consInteiro":
                     return "INT"
                 elif name == "consReal":
