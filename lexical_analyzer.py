@@ -1,12 +1,11 @@
-from symbol_table import SymbolTable
 import re
 
 
-class LexicalAnalyser:
-    def __init__(self, reserved_words_and_symbols_table, token_table):
-        self.reserved_words_and_symbols = reserved_words_and_symbols_table  # Pair of reserved words and symbols with their codes
-        self.token_table = token_table  # Pair of token types with their codes
-        self.symbol_table = SymbolTable()
+class LexicalAnalyzer:
+    def __init__(self, reserved_words_and_symbols, token_table, symbol_table):
+        self.reserved_words_and_symbols = reserved_words_and_symbols
+        self.token_table = token_table
+        self.symbol_table = symbol_table
         self.state = 0
         self.lexeme = ""
         self.current_line = 1
@@ -20,16 +19,35 @@ class LexicalAnalyser:
             "variavel": re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$"),
         }
 
+    # TODO: The first level filter here is breaking consCadeia, like only saving MINHA for "Minha Str@@@ing"
+    def is_valid_character(self, char):
+        # Check if the character is a key in reserved_words_and_symbols
+        if char in self.reserved_words_and_symbols:
+            return True
+        # Check if the character matches any token pattern
+        if any(pattern.fullmatch(char) for pattern in self.token_patterns.values()):
+            return True
+        # Check if the character is whitespace or a newline
+        if char in " \n":
+            return True
+        # Check if the character is part of a comment
+        if char in "/*" or (char == "*" and char in "/"):
+            return True
+        return False
+
     def analyze(self, text):
         i = 0
         while i < len(text):
             char = text[i]
 
-            # Convert to uppercase to make analysis case insensitive and save lexeme in uppercase
+            # If char is not valid, skip it
+            if not self.is_valid_character(char):
+                i += 1
+                continue
+
             if isinstance(char, str):
                 char = char.upper()
 
-            # In case of line break, always finish the token before incrementing the current line
             if char == "\n":
                 if self.lexeme:
                     self.finish_token()
@@ -131,9 +149,3 @@ class LexicalAnalyser:
                     return "PFO"
                 return name  # Default to the name if no specific type is needed
         return "UNKNOWN"  # Default type for unknown token
-
-    # def determine_type(self, token):
-    #     for name, pattern in self.token_patterns.items():
-    #         if pattern.fullmatch(token):
-    #             return name  # Return the name as the type for simplicity
-    #     return "UNKNOWN"  # Default type for unknown token
