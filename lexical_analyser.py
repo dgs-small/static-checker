@@ -1,6 +1,7 @@
 from symbol_table import SymbolTable
 import re
 
+
 class LexicalAnalyser:
     def __init__(self, reserved_words_and_symbols_table, token_table):
         self.reserved_words_and_symbols = reserved_words_and_symbols_table  # Pair of reserved words and symbols with their codes
@@ -23,7 +24,7 @@ class LexicalAnalyser:
         i = 0
         while i < len(text):
             char = text[i]
-            
+
             # Convert to uppercase to make analysis case insensitive and save lexeme in uppercase
             if isinstance(char, str):
                 char = char.upper()
@@ -48,10 +49,13 @@ class LexicalAnalyser:
                     self.lexeme += char
                 elif char in self.reserved_words_and_symbols:
                     self.symbol_table.add_symbol(
-                        self.reserved_words_and_symbols[char], char, "SYMBOL", [self.current_line]
+                        self.reserved_words_and_symbols[char],
+                        char,
+                        "SYMBOL",
+                        [self.current_line],
                     )
                 elif char.isspace():
-                    if char == '\n':
+                    if char == "\n":
                         if self.lexeme:
                             self.finish_token()
                         self.current_line += 1
@@ -62,7 +66,7 @@ class LexicalAnalyser:
                     self.lexeme += char
                 else:
                     self.finish_token()
-                    if char == '\n':
+                    if char == "\n":
                         self.current_line += 1
                     i -= 1  # Reprocess this character in initial state
             elif self.state == 2:
@@ -73,7 +77,7 @@ class LexicalAnalyser:
                     self.lexeme += char
                 else:
                     self.finish_token()
-                    if char == '\n':
+                    if char == "\n":
                         self.current_line += 1
                     i -= 1  # Reprocess this character in initial state
             elif self.state == 3:
@@ -89,7 +93,7 @@ class LexicalAnalyser:
                     self.lexeme += char
                 else:
                     self.finish_token()
-                    if char == '\n':
+                    if char == "\n":
                         self.current_line += 1
                     i -= 1  # Reprocess this character in initial state
 
@@ -111,9 +115,25 @@ class LexicalAnalyser:
             if pattern.fullmatch(token):
                 return self.token_table.get(name, 0)
         return 0  # Default code for unknown token
-    
+
     def determine_type(self, token):
         for name, pattern in self.token_patterns.items():
             if pattern.fullmatch(token):
-                return name  # Return the name as the type for simplicity
+                if name in ["variavel", "nomPrograma", "nomFuncao"]:
+                    return "VOI"
+                elif name == "consCadeia":
+                    return "STR"
+                elif name == "consCaracter":
+                    return "CHR"
+                elif name == "consInteiro":
+                    return "INT"
+                elif name == "consReal":
+                    return "PFO"
+                return name  # Default to the name if no specific type is needed
         return "UNKNOWN"  # Default type for unknown token
+
+    # def determine_type(self, token):
+    #     for name, pattern in self.token_patterns.items():
+    #         if pattern.fullmatch(token):
+    #             return name  # Return the name as the type for simplicity
+    #     return "UNKNOWN"  # Default type for unknown token
