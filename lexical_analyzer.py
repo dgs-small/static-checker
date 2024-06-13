@@ -19,31 +19,19 @@ class LexicalAnalyzer:
             "variavel": re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$"),
         }
 
-    # TODO: The first level filter here is breaking consCadeia, like only saving MINHA for "Minha Str@@@ing"
-    def is_valid_character(self, char):
-        # Check if the character is a key in reserved_words_and_symbols
-        if char in self.reserved_words_and_symbols:
-            return True
-        # Check if the character matches any token pattern
-        if any(pattern.fullmatch(char) for pattern in self.token_patterns.values()):
-            return True
-        # Check if the character is whitespace or a newline
-        if char in " \n":
-            return True
-        # Check if the character is part of a comment
-        if char in "/*" or (char == "*" and char in "/"):
-            return True
-        return False
+    def first_level_filter(self, text):
+        # Define a set of valid characters
+        valid_characters = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$"
+        )
+        # Keep only valid characters
+        return "".join([char if char in valid_characters else "" for char in text])
 
     def analyze(self, text):
+        text = self.first_level_filter(text)
         i = 0
         while i < len(text):
             char = text[i]
-
-            # If char is not valid, skip it
-            if not self.is_valid_character(char):
-                i += 1
-                continue
 
             if isinstance(char, str):
                 char = char.upper()
