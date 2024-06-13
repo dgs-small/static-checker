@@ -42,6 +42,22 @@ class LexicalAnalyzer:
                 if self.lexeme:
                     self.finish_token()
                 self.current_line += 1
+            elif char == "/" and i + 1 < len(text) and text[i + 1] == "*":
+                if self.lexeme:
+                    self.finish_token()
+                i += 2
+                while i < len(text) - 1 and not (text[i] == "*" and text[i + 1] == "/"):
+                    if text[i] == "\n":
+                        self.current_line += 1
+                    i += 1
+                i += 1  # Skip the closing '/'
+            elif char == "/" and i + 1 < len(text) and text[i + 1] == "/":
+                if self.lexeme:
+                    self.finish_token()
+                i += 2
+                while i < len(text) and text[i] != "\n":
+                    i += 1
+                i -= 1  # Let the newline character be processed in the main loop
             elif self.state == 0:
                 if char.isalpha():
                     self.state = 1
