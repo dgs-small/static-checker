@@ -18,20 +18,22 @@ class LexicalAnalyzer:
             "nomPrograma": re.compile(r"^[a-zA-Z][a-zA-Z0-9]*$"),
             "variavel": re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$"),
         }
-
-    def first_level_filter(self, text):
-        # Define a set of valid characters
-        valid_characters = set(
+        self.valid_characters = set(
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$"
         )
-        # Keep only valid characters
-        return "".join([char if char in valid_characters else "" for char in text])
+
+    def first_level_filter(self, char):
+        return char if char in self.valid_characters else ""
 
     def analyze(self, text):
-        text = self.first_level_filter(text)
         i = 0
         while i < len(text):
             char = text[i]
+            char = self.first_level_filter(char)
+
+            if not char:
+                i += 1
+                continue
 
             if isinstance(char, str):
                 char = char.upper()
