@@ -3,6 +3,8 @@ import os
 from utils import reserved_words_and_symbols_table, token_table, generate_report_files
 from lexical_analyzer import LexicalAnalyzer
 from symbol_table import SymbolTable
+from lexical_table import LexicalTable
+
 
 def main():
     # Solicita o nome do arquivo ao usuário
@@ -24,10 +26,17 @@ def main():
 def start_lexical_analyser(file_content, filename, file_path):
     if file_content is not None:
         lexical_analyser = LexicalAnalyzer(
-            reserved_words_and_symbols_table(), token_table(), SymbolTable()
+            reserved_words_and_symbols_table(),
+            token_table(),
+            SymbolTable(),
+            LexicalTable(),
         )
         lexical_analyser.analyze(file_content)
-        generate_report_files(filename, lexical_analyser.symbol_table.table, file_path)
+        
+        filled_symbol_table = lexical_analyser.symbol_table.table
+        filled_lexical_table = lexical_analyser.lexical_table.table
+        
+        generate_report_files(filename, filled_symbol_table, filled_lexical_table, file_path)
 
 
 def read_code_file(filename, report_filename):

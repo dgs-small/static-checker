@@ -1,11 +1,12 @@
 import re
 
-
 class LexicalAnalyzer:
-    def __init__(self, reserved_words_and_symbols, token_table, symbol_table):
+    def __init__(self, reserved_words_and_symbols, token_table, symbol_table, lexical_table):
         self.reserved_words_and_symbols = reserved_words_and_symbols
+        self.reserved_words_and_symbols_lower = {key.lower(): value for key, value in reserved_words_and_symbols.items()}
         self.token_table = token_table
         self.symbol_table = symbol_table
+        self.lexical_table = lexical_table
         self.state = 0
         self.lexeme = ""
         self.current_line = 1
@@ -71,12 +72,11 @@ class LexicalAnalyzer:
                 elif char == "'":
                     self.state = 4
                     self.lexeme += char
-                elif char in self.reserved_words_and_symbols:
-                    self.symbol_table.add_symbol(
-                        self.reserved_words_and_symbols[char],
+                elif char.lower() in self.reserved_words_and_symbols_lower:
+                    self.lexical_table.add_atom(
+                        self.reserved_words_and_symbols_lower[char.lower()],
                         char,
-                        "SYMBOL",
-                        [self.current_line],
+                        self.current_line
                     )
                 elif char.isspace():
                     if char == "\n":
@@ -130,11 +130,18 @@ class LexicalAnalyzer:
     def finish_token(self):
         token_type = self.determine_type(self.lexeme)
         code = self.determine_code(self.lexeme)
-        self.symbol_table.add_symbol(code, self.lexeme, token_type, [self.current_line])
+        if code in self.reserved_words_and_symbols.values():
+            self.lexical_table.add_atom(code, self.lexeme, self.current_line)
+        else:
+            symbol_entry = self.symbol_table.add_symbol(code, self.lexeme, token_type, [self.current_line])
+            self.lexical_table.add_atom(code, self.lexeme, self.current_line, symbol_entry.get("entry_number"))
         self.state = 0
         self.lexeme = ""
 
     def determine_code(self, token):
+        lower_case_token = token.lower()
+        if lower_case_token in self.reserved_words_and_symbols_lower:
+            return self.reserved_words_and_symbols_lower[lower_case_token]
         for name, pattern in self.token_patterns.items():
             if pattern.fullmatch(token):
                 return self.token_table.get(name, 0)

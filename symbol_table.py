@@ -19,6 +19,10 @@ class SymbolTable:
             }
             self.indices[lexeme] = len(self.table)
             self.table.append(entry)
+        
+        idx = self.indices[lexeme]
+        
+        return self.table[idx]
     
     def __str__(self):
         return str(self.table)

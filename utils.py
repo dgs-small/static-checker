@@ -68,7 +68,9 @@ def token_table():
     return token_table
 
 
-def generate_report_files(report_filename, content, code_filename):
+def generate_report_files(
+    report_filename, filled_symbol_table, filled_lexical_table, code_filename
+):
     report_file_header = """Codigo da Equipe: EQ01\nComponentes:
     Tiago Galvão Pinho; tiagog.pinho@ucsal.edu.br; (71)98366-3017
     João Marcos Gatis Araújo Silva; joaomg.silva@ucsal.edu.br; (71)99900-9154
@@ -83,14 +85,21 @@ def generate_report_files(report_filename, content, code_filename):
             f"RELATÓRIO DA ANÁLISE LÉXICA. Texto fonte analisado: {code_filename}\n"
         )
         report_file_lex.write(
-            "---------------------------------------------------------\n"
+            "----------------------------------------------------------------------------\n"
         )
-        report_file_lex.write("A fazer")
-        # for entry in content:
-        #     report_file_tab.write(
-        #         f"----------------------------------------------------------------------------\nLexeme: {entry.get('lexeme')}, Código: {entry.get('atom_code')}, IndiceTabSimb: {entry.get('entry_number')}, Linha: {str(entry.get('lines'))}\n"
-        #     )
-        
+
+        for line, entries in filled_lexical_table.items():
+            for entry in entries:
+                lexeme = entry.get("lexeme", "")
+                atom_code = entry.get("atom_code", "")
+                symbol_table_index = entry.get("symbol_table_index", "")
+                report_file_lex.write(
+                    f"Lexeme: {lexeme}, Código: {atom_code}, "
+                    f"IndiceTabSimb: {symbol_table_index}, Linha: {line}\n"
+                )
+                report_file_lex.write(
+                    "----------------------------------------------------------------------------\n"
+                )
 
     print(f"Relatório gerado com sucesso: {lex_reportfile_name}")
 
@@ -102,7 +111,7 @@ def generate_report_files(report_filename, content, code_filename):
             f"RELATÓRIO DA TABELA DE SIMBOLOS. Texto fonte analisado: {code_filename}\n"
         )
 
-        for entry in content:
+        for entry in filled_symbol_table:
             report_file_tab.write(
                 f"----------------------------------------------------------------------------\nEntrada: {entry.get('entry_number')}, Código: {entry.get('atom_code')}, Lexeme: {entry.get('lexeme')}, QtdCharAntesTrunc: {entry.get('original_length')}, QtdCharDepoisTrunc: {entry.get('truncated_length')}, TipoSimb: {entry.get('symbol_type')}, Linha: {str(entry.get('lines'))}\n"
             )

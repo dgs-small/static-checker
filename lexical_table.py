@@ -7,7 +7,7 @@ class LexicalTable:
         
         entry = {
             "lexeme": lexeme,
-            "code": code,
+            "atom_code": code,
             "symbol_table_index": (symbol_table_index if symbol_table_index else "-"),
             "line": line_str,
         }
