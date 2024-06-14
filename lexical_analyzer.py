@@ -1,9 +1,14 @@
 import re
 
+
 class LexicalAnalyzer:
-    def __init__(self, reserved_words_and_symbols, token_table, symbol_table, lexical_table):
+    def __init__(
+        self, reserved_words_and_symbols, token_table, symbol_table, lexical_table
+    ):
         self.reserved_words_and_symbols = reserved_words_and_symbols
-        self.reserved_words_and_symbols_lower = {key.lower(): value for key, value in reserved_words_and_symbols.items()}
+        self.reserved_words_and_symbols_lower = {
+            key.lower(): value for key, value in reserved_words_and_symbols.items()
+        }
         self.token_table = token_table
         self.symbol_table = symbol_table
         self.lexical_table = lexical_table
@@ -20,7 +25,7 @@ class LexicalAnalyzer:
             "variavel": re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$"),
         }
         self.valid_characters = set(
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$%():,;?[]{}-*+/!=#<>"
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$%():,;?[]{}-*+/!=#<>="
         )
 
     def first_level_filter(self, char):
@@ -72,11 +77,19 @@ class LexicalAnalyzer:
                 elif char == "'":
                     self.state = 4
                     self.lexeme += char
+                elif (
+                    i + 1 < len(text)
+                    and char + text[i + 1] in self.reserved_words_and_symbols
+                ):
+                    self.lexical_table.add_atom(
+                        self.reserved_words_and_symbols[char + text[i + 1]],
+                        char + text[i + 1],
+                        self.current_line,
+                    )
+                    i += 1  # Skip the next character
                 elif char in self.reserved_words_and_symbols:
                     self.lexical_table.add_atom(
-                        self.reserved_words_and_symbols[char],
-                        char,
-                        self.current_line
+                        self.reserved_words_and_symbols[char], char, self.current_line
                     )
                 elif char.isspace():
                     if char == "\n":
@@ -133,8 +146,12 @@ class LexicalAnalyzer:
         if code in self.reserved_words_and_symbols.values():
             self.lexical_table.add_atom(code, self.lexeme, self.current_line)
         else:
-            symbol_entry = self.symbol_table.add_symbol(code, self.lexeme, token_type, [self.current_line])
-            self.lexical_table.add_atom(code, self.lexeme, self.current_line, symbol_entry.get("entry_number"))
+            symbol_entry = self.symbol_table.add_symbol(
+                code, self.lexeme, token_type, [self.current_line]
+            )
+            self.lexical_table.add_atom(
+                code, self.lexeme, self.current_line, symbol_entry.get("entry_number")
+            )
         self.state = 0
         self.lexeme = ""
 
