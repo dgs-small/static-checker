@@ -20,7 +20,7 @@ class LexicalAnalyzer:
             "variavel": re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$"),
         }
         self.valid_characters = set(
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$"
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\"' \n/*.$%():,;?[]{}-*+/!=#<>"
         )
 
     def first_level_filter(self, char):
@@ -72,9 +72,9 @@ class LexicalAnalyzer:
                 elif char == "'":
                     self.state = 4
                     self.lexeme += char
-                elif char.lower() in self.reserved_words_and_symbols_lower:
+                elif char in self.reserved_words_and_symbols:
                     self.lexical_table.add_atom(
-                        self.reserved_words_and_symbols_lower[char.lower()],
+                        self.reserved_words_and_symbols[char],
                         char,
                         self.current_line
                     )
