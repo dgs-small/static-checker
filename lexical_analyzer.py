@@ -133,16 +133,17 @@ class LexicalAnalyzer:
                 self.lexeme += char
                 if char == '"':
                     self.finish_token()
+            # TODO: Review logis here. It's creating some random tokens on symbol table
             elif self.state == 4:
                 self.lexeme += char
                 if len(self.lexeme) > 3:
+                    print(f"Invalid character constant: {self.lexeme}")
                     self.state = 0
                     self.lexeme = ""
-                    print(f"Invalid character constant: {self.lexeme}")
                 elif char == "'" and (len(self.lexeme) != 3):
+                    print(f"Invalid character constant: {self.lexeme}")
                     self.state = 0
                     self.lexeme = ""
-                    print(f"Invalid character constant: {self.lexeme}")
                 elif char == "'" and len(self.lexeme) == 3:
                     self.finish_token()
             elif self.state == 5:
