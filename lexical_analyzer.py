@@ -17,7 +17,7 @@ class LexicalAnalyzer:
         self.current_line = 1
         self.token_patterns = {
             "consCadeia": re.compile(r'^".*"$'),
-            "consCaracter": re.compile(r"^'.'$"),
+            "consCaracter": re.compile(r"^'[^']'$"),
             "consInteiro": re.compile(r"^\d+$"),
             "consReal": re.compile(r"^\d+\.\d+([eE][-+]?\d+)?$"),
             "nomFuncao": re.compile(r"^[a-zA-Z][a-zA-Z0-9]*$"),
@@ -42,6 +42,7 @@ class LexicalAnalyzer:
         - State 4 -> Single-quote character recognition (consCaracter)
         - State 5 ->  Real Number Recognition (consReal)
     """
+
     def analyze(self, text):
         i = 0
         while i < len(text):
@@ -134,7 +135,15 @@ class LexicalAnalyzer:
                     self.finish_token()
             elif self.state == 4:
                 self.lexeme += char
-                if char == "'":
+                if len(self.lexeme) > 3:
+                    self.state = 0
+                    self.lexeme = ""
+                    print(f"Invalid character constant: {self.lexeme}")
+                elif char == "'" and (len(self.lexeme) != 3):
+                    self.state = 0
+                    self.lexeme = ""
+                    print(f"Invalid character constant: {self.lexeme}")
+                elif char == "'" and len(self.lexeme) == 3:
                     self.finish_token()
             elif self.state == 5:
                 if char.isdigit():
@@ -147,7 +156,6 @@ class LexicalAnalyzer:
 
             i += 1
 
-        # Finalize last token if necessary
         if self.lexeme:
             self.finish_token()
 
@@ -172,8 +180,59 @@ class LexicalAnalyzer:
             return self.reserved_words_and_symbols_lower[lower_case_token]
         for name, pattern in self.token_patterns.items():
             if pattern.fullmatch(token):
+                if name in ["nomPrograma", "nomFuncao", "variavel"]:
+                    return self.determine_specific_code(token)
                 return self.token_table.get(name, 0)
         return 0  # Default code for unknown token
+
+    def determine_specific_code(self, token):
+        if self.is_nom_programa():
+            return self.token_table["nomPrograma"]
+        elif self.is_nom_funcao():
+            return self.token_table["nomFuncao"]
+        else:
+            return self.token_table["variavel"]
+
+    def is_nom_programa(self):
+        last_token = self.get_last_token()
+        if last_token and last_token["lexeme"].lower() == "programa":
+            return True
+        return False
+
+    def is_nom_funcao(self):
+        last_three_tokens = self.get_last_n_tokens(3)
+        if (
+            len(last_three_tokens) == 3
+            and last_three_tokens[0]["lexeme"].lower() == "tipofunc"
+            and last_three_tokens[1]["lexeme"].lower()
+            in [
+                "real",
+                "inteiro",
+                "cadeia",
+                "logico",
+                "caracter",
+                "vazio",
+            ]
+            and last_three_tokens[2]["lexeme"] == ":"
+        ):
+            return True
+        return False
+
+    def get_last_token(self):
+        lines = sorted(self.lexical_table.table.keys(), key=int)
+        if not lines:
+            return None
+        last_line = lines[-1]
+        return self.lexical_table.table[last_line][-1]
+
+    def get_last_n_tokens(self, n):
+        tokens = []
+        lines = sorted(self.lexical_table.table.keys(), key=int, reverse=True)
+        for line in lines:
+            tokens.extend(reversed(self.lexical_table.table[line]))
+            if len(tokens) >= n:
+                break
+        return list(reversed(tokens[-n:])) if len(tokens) >= n else []
 
     def determine_type(self, token):
         for name, pattern in self.token_patterns.items():
@@ -188,5 +247,5 @@ class LexicalAnalyzer:
                     return "INT"
                 elif name == "consReal":
                     return "PFO"
-                return name  # Default to the name if no specific type is needed
-        return "UNKNOWN"  # Default type for unknown token
+                return name
+        return "UNKNOWN"
