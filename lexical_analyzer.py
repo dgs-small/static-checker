@@ -31,6 +31,17 @@ class LexicalAnalyzer:
     def first_level_filter(self, char):
         return char if char in self.valid_characters else ""
 
+    """
+        This method analyzes each char in the provided text, count the current line and create tokens.
+        It also controls the automate's states:
+        - State 0 -> Initial state of the automate. Basically verifies all cases for the current char, like if it's a number or a reserved symbol of the lang.
+                    Changes the state, finish the token, or continue to next char/line of the text
+        - State 1 -> Identifier recognition (nomPrograma, variavel, nomFuncao)
+        - State 2 -> Integer recognition (consInteiro)
+        - State 3 -> String recognition enclosed in double quotes (consCadeia)
+        - State 4 -> Single-quote character recognition (consCaracter)
+        - State 5 ->  Real Number Recognition (consReal)
+    """
     def analyze(self, text):
         i = 0
         while i < len(text):
