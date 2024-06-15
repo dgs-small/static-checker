@@ -16,7 +16,7 @@ class LexicalAnalyzer:
         self.lexeme = ""
         self.current_line = 1
         self.token_patterns = {
-            "consCadeia": re.compile(r'^".*"$'),
+            "consCadeia": re.compile(r'^"[a-zA-Z0-9 $._]*"$'),
             "consCaracter": re.compile(r"^'[a-zA-Z]'$"),
             "consInteiro": re.compile(r"^\d+$"),
             "consReal": re.compile(r"^\d+\.\d+([eE][-+]?\d+)?$"),
