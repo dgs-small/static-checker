@@ -41,7 +41,7 @@ class LexicalAnalyzer:
         - State 3 -> String recognition enclosed in double quotes (consCadeia)
         - State 4 -> Single-quote character recognition (consCaracter)
         - State 5 -> Real Number Recognition (consReal)
-        - State 6 -> State to validate exponential notation
+        - State 6 -> State to validate exponential notation usage on consReal
     """
 
     def analyze(self, text):
