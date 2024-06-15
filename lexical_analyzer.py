@@ -166,11 +166,13 @@ class LexicalAnalyzer:
         if code in self.reserved_words_and_symbols.values():
             self.lexical_table.add_atom(code, self.lexeme, self.current_line)
         elif code != 0:
+            truncated_lexeme, code, token_type, original_length = self.perform_token_truncate(self.lexeme, code)
+            
             symbol_entry = self.symbol_table.add_symbol(
-                code, self.lexeme, token_type, [self.current_line]
+                code, truncated_lexeme, original_length, token_type, [self.current_line]
             )
             self.lexical_table.add_atom(
-                code, self.lexeme, self.current_line, symbol_entry.get("entry_number")
+                code, truncated_lexeme, self.current_line, symbol_entry.get("entry_number")
             )
         self.state = 0
         self.lexeme = ""
@@ -250,3 +252,25 @@ class LexicalAnalyzer:
                     return "PFO"
                 return name
         return "UNKNOWN"
+
+
+    def perform_token_truncate(self, token, current_token_code):
+        original_length = len(token)
+        lexeme = token[:30]
+        token_code = current_token_code
+
+        if token_code == "C01":  # consCadeia
+            if len(lexeme) == 30 and lexeme[-1] != '"':
+                lexeme = lexeme[:29] + '"'
+        elif token_code == "C04":  # consReal
+            if lexeme[-1] == '.' or lexeme[-1] == 'e' or lexeme[-1] == '+' or lexeme[-1] == '-':
+                lexeme = lexeme[:-1]
+                token_code = self.token_table.get("consInteiro", 0)  # Ajustar para consInteiro
+
+        # Chamar determine_type e determine_code novamente após truncagem
+        token_type = self.determine_type(lexeme)
+        token_code = self.determine_code(lexeme)
+
+        return [lexeme, token_code, token_type, original_length]
+        
+        

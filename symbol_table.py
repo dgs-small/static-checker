@@ -3,7 +3,7 @@ class SymbolTable:
         self.table = []
         self.indices = {}
     
-    def add_symbol(self, code, lexeme, symbol_type, lines):
+    def add_symbol(self, code, lexeme, original_length, symbol_type, lines):
         if lexeme in self.indices:
             idx = self.indices[lexeme]
             self.table[idx]["lines"] += lines[:5 - len(self.table[idx]["lines"])]
@@ -11,9 +11,9 @@ class SymbolTable:
             entry = {
                 "entry_number": len(self.table) + 1,
                 "atom_code": code, #Ex: C07
-                "lexeme": lexeme[:30],  # Truncagem de lexeme para 30 caracteres
-                "original_length": len(lexeme),
-                "truncated_length": min(len(lexeme), 30),
+                "lexeme": lexeme,
+                "original_length": original_length,
+                "truncated_length": len(lexeme),
                 "symbol_type": symbol_type,
                 "lines": lines[:5]  # Armazena apenas as 5 primeiras linhas onde o simbolo aparece
             }
