@@ -165,7 +165,7 @@ class LexicalAnalyzer:
         code = self.determine_code(self.lexeme)
         if code in self.reserved_words_and_symbols.values():
             self.lexical_table.add_atom(code, self.lexeme, self.current_line)
-        else:
+        elif code != 0:
             symbol_entry = self.symbol_table.add_symbol(
                 code, self.lexeme, token_type, [self.current_line]
             )
