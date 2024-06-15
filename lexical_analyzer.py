@@ -136,16 +136,23 @@ class LexicalAnalyzer:
                     self.finish_token()
             # TODO: Review logis here. It's creating some random tokens on symbol table
             elif self.state == 4:
+                while i < len(text) - 1 and not text[i] == "'":
+                    char = text[i]
+                    char = self.first_level_filter(char)
+                    char = char.upper()
+                    if text[i] == "\n":
+                        self.current_line += 1
+                    self.lexeme += char
+                    i += 1
+                if len(self.lexeme) > 1:
+                    char = text[i]
+                    char = self.first_level_filter(char)
+                    char = char.upper()
                 self.lexeme += char
-                if len(self.lexeme) > 3:
-                    print(f"Invalid character constant: {self.lexeme}")
+                if len(self.lexeme) != 3:
                     self.state = 0
                     self.lexeme = ""
-                elif char == "'" and (len(self.lexeme) != 3):
-                    print(f"Invalid character constant: {self.lexeme}")
-                    self.state = 0
-                    self.lexeme = ""
-                elif char == "'" and len(self.lexeme) == 3:
+                else:
                     self.finish_token()
             elif self.state == 5:
                 if char.isdigit():
@@ -181,13 +188,18 @@ class LexicalAnalyzer:
         if code in self.reserved_words_and_symbols.values():
             self.lexical_table.add_atom(code, self.lexeme, self.current_line)
         elif code != 0:
-            truncated_lexeme, code, token_type, original_length = self.perform_token_truncate(self.lexeme, code)
-            
+            truncated_lexeme, code, token_type, original_length = (
+                self.perform_token_truncate(self.lexeme, code)
+            )
+
             symbol_entry = self.symbol_table.add_symbol(
                 code, truncated_lexeme, original_length, token_type, [self.current_line]
             )
             self.lexical_table.add_atom(
-                code, truncated_lexeme, self.current_line, symbol_entry.get("entry_number")
+                code,
+                truncated_lexeme,
+                self.current_line,
+                symbol_entry.get("entry_number"),
             )
         self.state = 0
         self.lexeme = ""
@@ -268,7 +280,6 @@ class LexicalAnalyzer:
                 return name
         return "UNKNOWN"
 
-
     def perform_token_truncate(self, token, current_token_code):
         original_length = len(token)
         lexeme = token[:30]
@@ -278,14 +289,19 @@ class LexicalAnalyzer:
             if len(lexeme) == 30 and lexeme[-1] != '"':
                 lexeme = lexeme[:29] + '"'
         elif token_code == "C04":  # consReal
-            if lexeme[-1] == '.' or lexeme[-1] == 'e' or lexeme[-1] == '+' or lexeme[-1] == '-':
+            if (
+                lexeme[-1] == "."
+                or lexeme[-1] == "e"
+                or lexeme[-1] == "+"
+                or lexeme[-1] == "-"
+            ):
                 lexeme = lexeme[:-1]
-                token_code = self.token_table.get("consInteiro", 0)  # Ajustar para consInteiro
+                token_code = self.token_table.get(
+                    "consInteiro", 0
+                )  # Ajustar para consInteiro
 
         # Chamar determine_type e determine_code novamente após truncagem
         token_type = self.determine_type(lexeme)
         token_code = self.determine_code(lexeme)
 
         return [lexeme, token_code, token_type, original_length]
-        
-        
