@@ -40,7 +40,8 @@ class LexicalAnalyzer:
         - State 2 -> Integer recognition (consInteiro)
         - State 3 -> String recognition enclosed in double quotes (consCadeia)
         - State 4 -> Single-quote character recognition (consCaracter)
-        - State 5 ->  Real Number Recognition (consReal)
+        - State 5 -> Real Number Recognition (consReal)
+        - State 6 -> State to validate exponential notation
     """
 
     def analyze(self, text):
@@ -149,11 +150,25 @@ class LexicalAnalyzer:
             elif self.state == 5:
                 if char.isdigit():
                     self.lexeme += char
+                elif char == "E" and self.lexeme[-1] != ".":
+                    self.lexeme += char
+                    self.state = 6
                 else:
                     self.finish_token()
                     if char == "\n":
                         self.current_line += 1
                     i -= 1  # Reprocess this character in initial state
+            elif self.state == 6:
+                if char.isdigit():
+                    self.lexeme += char
+                elif char == "+" and char not in self.lexeme and "-" not in self.lexeme:
+                    self.lexeme += char
+                elif char == "-" and char not in self.lexeme and "+" not in self.lexeme:
+                    self.lexeme += char
+                else:
+                    self.finish_token()
+                    if char == "\n":
+                        self.current_line += 1
 
             i += 1
 
